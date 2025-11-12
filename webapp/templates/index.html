@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Mental Health Tone Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .user-section {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .auth-buttons {
+            display: inline-flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-method-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .input-area {
+            display: none;
+        }
+
+        .input-area.active {
+            display: block;
+        }
+
+        .text-input {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .speech-controls {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .record-btn {
+            padding: 15px 30px;
+            font-size: 18px;
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .record-btn.recording {
+            background: #ff3838;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .audio-visualizer {
+            width: 100%;
+            height: 80px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+        }
+
+        .results-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .emotion-result {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .confidence-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .advice-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .advice-category {
+            margin-bottom: 15px;
+        }
+
+        .advice-category h4 {
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .advice-category ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .advice-category li {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .model-status {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .history-section {
+            margin-top: 20px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .history-emotion {
+            padding: 4px 12px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.8;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <h1>AI Mental Health Tone Detector</h1>
+            <p>Express your feelings and get AI-powered emotional analysis with personalized mental health support</p>
+        </div>
+
+        <!-- User Authentication Section -->
+        <div class="user-section">
+            <div class="auth-buttons">
+                <a href="/auth/login" class="btn btn-primary">Login</a>
+                <a href="/auth/register" class="btn btn-secondary">Register</a>
+                <a href="/dashboard" class="btn btn-primary">Dashboard</a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Input Section -->
+            <div class="card">
+                <h2>How Are You Feeling?</h2>
+                <p style="margin: 10px 0; color: #666;">
+                    Share your thoughts, feelings, or what's on your mind...
+                </p>
+                
+                <!-- Input Method Tabs -->
+                <div class="input-method-tabs">
+                    <button class="tab-btn active" onclick="switchTab('text')">Text Input</button>
+                    <button class="tab-btn" onclick="switchTab('speech')">Speech Input</button>
+                </div>
+
+                <!-- Text Input Area -->
+                <div id="text-input" class="input-area active">
+                    <textarea 
+                        class="text-input" 
+                        placeholder="Examples:
+• 'I feel happy and excited about my achievements'
+• 'I'm feeling stressed about work deadlines'
+• 'I feel lonely and disconnected from people'
+• 'I'm anxious about the future'"
+                    ></textarea>
+                </div>
+
+                <!-- Speech Input Area -->
+                <div id="speech-input" class="input-area">
+                    <div class="speech-controls">
+                        <button class="record-btn" id="recordButton" onclick="toggleRecording()">
+                            🎤 Start Recording
+                        </button>
+                        <div class="audio-visualizer" id="visualizer">
+                            <!-- Audio visualization will appear here -->
+                        </div>
+                        <div id="recordingStatus">Press the button to start recording</div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="analyzeInput()">Analyze Emotional Tone</button>
+                    <button class="btn btn-danger" onclick="clearInput()">Clear</button>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="card">
+                <h2>Analysis Results</h2>
+                
+                <div class="model-status" id="modelStatus">
+                    <strong>✅ AI Model Ready!</strong><br>
+                    <span id="modelInfo">Trained model loaded with high accuracy</span>
+                </div>
+
+                <div id="resultsArea">
+                    <p style="color: #666; text-align: center; padding: 40px;">
+                        Enter your thoughts above to get AI-powered emotional analysis.
+                    </p>
+                </div>
+
+                <!-- Advice Section (Hidden initially) -->
+                <div class="advice-section hidden" id="adviceSection">
+                    <h3>Personalized Support</h3>
+                    <div id="adviceContent"></div>
+                </div>
+
+                <!-- History Section -->
+                <div class="history-section">
+                    <h3>Recent Analysis History</h3>
+                    <div id="historyList">
+                        <!-- History items will be loaded here -->
+                    </div>
+                    <button class="btn btn-danger" onclick="clearHistory()" style="margin-top: 10px;">
+                        Clear History
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>AI-Powered Mental Health Support | Safe & Confidential</p>
+        </div>
+    </div>
+
+    <script>
+        let isRecording = false;
+let currentTab = 'text';
+let mediaRecorder = null;
+let audioChunks = [];
+let currentRecordingId = null;
+
+// Switch between text and speech tabs
+function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.input-area').forEach(area => area.classList.remove('active'));
+    
+    document.querySelector(`.tab-btn:nth-child(${tab === 'text' ? 1 : 2})`).classList.add('active');
+    document.getElementById(`${tab}-input`).classList.add('active');
+    
+    // Reset recording state when switching tabs
+    if (tab === 'text') {
+        resetRecordingUI();
+    }
+}
+
+// Reset recording UI
+function resetRecordingUI() {
+    isRecording = false;
+    const recordButton = document.getElementById('recordButton');
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    recordButton.textContent = '🎤 Start Recording';
+    recordButton.classList.remove('recording');
+    statusDiv.textContent = 'Press the button to start recording';
+    statusDiv.style.color = '#666';
+    
+    // Clear any previous recording ID
+    currentRecordingId = null;
+}
+
+// Generate unique ID for each recording
+function generateRecordingId() {
+    return 'rec_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Toggle audio recording
+async function toggleRecording() {
+    const recordButton = document.getElementById('recordButton');
+    const statusDiv = document.getElementById('recordingStatus');
+
+    if (!isRecording) {
+        // Start recording
+        await startRecording();
+    } else {
+        // Stop recording
+        await stopRecording();
+    }
+}
+
+// Start audio recording
+async function startRecording() {
+    const recordButton = document.getElementById('recordButton');
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    try {
+        // Generate new recording ID
+        currentRecordingId = generateRecordingId();
+        console.log(`🎤 Starting recording with ID: ${currentRecordingId}`);
+        
+        // Check if browser supports media recording
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error('Browser does not support audio recording');
+        }
+
+        // Request microphone permission
+        const stream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                sampleRate: 16000
+            } 
+        });
+
+        // Set up media recorder
+        mediaRecorder = new MediaRecorder(stream);
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+            if (event.data.size > 0) {
+                audioChunks.push(event.data);
+            }
+        };
+
+        mediaRecorder.onstop = async () => {
+            // Create audio blob and send to server
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            await sendAudioToServer(audioBlob);
+            
+            // Stop all tracks
+            stream.getTracks().forEach(track => track.stop());
+        };
+
+        // Start recording
+        mediaRecorder.start();
+        isRecording = true;
+        
+        // Update UI
+        recordButton.textContent = '⏹️ Stop Recording';
+        recordButton.classList.add('recording');
+        statusDiv.textContent = '🔴 Recording... Speak now!';
+        statusDiv.style.color = '#f44336';
+        
+        console.log("🎤 Recording started...");
+
+    } catch (error) {
+        console.error('Error starting recording:', error);
+        statusDiv.textContent = '❌ Microphone access denied. Using server-side recording.';
+        statusDiv.style.color = '#f44336';
+        
+        // Fallback to server-side recording
+        await startServerSideRecording();
+    }
+}
+
+// Stop audio recording
+async function stopRecording() {
+    const recordButton = document.getElementById('recordButton');
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        
+        recordButton.textContent = '🎤 Start Recording';
+        recordButton.classList.remove('recording');
+        statusDiv.textContent = '🟢 Processing audio...';
+        statusDiv.style.color = '#4CAF50';
+        
+        console.log("⏹️ Recording stopped");
+    } else {
+        await stopServerSideRecording();
+    }
+}
+
+// Send audio to server for processing
+async function sendAudioToServer(audioBlob) {
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    try {
+        statusDiv.textContent = '📤 Uploading audio...';
+        
+        // Create FormData to send the audio file
+        const formData = new FormData();
+        formData.append('audio', audioBlob, `recording_${currentRecordingId}.wav`);
+        
+        // Add cache busting parameter
+        const cacheBuster = 't=' + Date.now();
+        
+        // Send to server
+        const response = await fetch('/upload-audio?' + cacheBuster, {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            statusDiv.textContent = '🔍 Analyzing emotion...';
+            await analyzeAudioFile(result.filename, currentRecordingId);
+        } else {
+            throw new Error(result.error || 'Upload failed');
+        }
+        
+    } catch (error) {
+        console.error('Error uploading audio:', error);
+        statusDiv.textContent = '❌ Upload failed. Using server recording.';
+        await startServerSideRecording();
+    }
+}
+
+// Server-side recording fallback
+async function startServerSideRecording() {
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    currentRecordingId = generateRecordingId();
+    isRecording = true;
+    statusDiv.textContent = '🔴 Server recording... Speak now!';
+    statusDiv.style.color = '#f44336';
+    
+    console.log("🎤 Server-side recording started");
+}
+
+async function stopServerSideRecording() {
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    isRecording = false;
+    statusDiv.textContent = '🟢 Analyzing server recording...';
+    statusDiv.style.color = '#4CAF50';
+    
+    await analyzeSpeech();
+}
+
+// Analyze speech using server-side recording
+async function analyzeSpeech() {
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    try {
+        statusDiv.textContent = '🎤 Recording audio...';
+        
+        // Add cache busting to prevent same response
+        const cacheBuster = 't=' + Date.now();
+        
+        // Record audio on server
+        const recordResponse = await fetch('/record-audio?' + cacheBuster, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                duration: 5,
+                recording_id: currentRecordingId || generateRecordingId()
+            })
+        });
+
+        const recordResult = await recordResponse.json();
+        
+        if (recordResult.success) {
+            statusDiv.textContent = '🔍 Analyzing audio...';
+            
+            // Analyze the recorded audio with cache busting
+            await analyzeAudioFile(recordResult.filename, currentRecordingId);
+        } else {
+            throw new Error(recordResult.error || 'Recording failed');
+        }
+        
+    } catch (error) {
+        console.error('Error in speech analysis:', error);
+        statusDiv.textContent = '❌ Analysis failed';
+        statusDiv.style.color = '#f44336';
+        showError('Speech analysis failed: ' + error.message);
+    }
+}
+
+// Analyze specific audio file with cache prevention
+async function analyzeAudioFile(filename, recordingId) {
+    const statusDiv = document.getElementById('recordingStatus');
+    
+    try {
+        // Add cache busting and unique ID
+        const cacheBuster = 't=' + Date.now();
+        
+        const analyzeResponse = await fetch('/analyze-audio?' + cacheBuster, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                filename: filename,
+                recording_id: recordingId || generateRecordingId()
+            })
+        });
+
+        const analyzeResult = await analyzeResponse.json();
+        
+        if (analyzeResult.success) {
+            statusDiv.textContent = '✅ Analysis complete!';
+            statusDiv.style.color = '#4CAF50';
+            
+            // Display results
+            displayResults(analyzeResult);
+            
+            // Show success message
+            showSuccess(`Detected: ${analyzeResult.emotion} (${(analyzeResult.confidence * 100).toFixed(1)}% confidence)`);
+        } else {
+            throw new Error(analyzeResult.error || 'Analysis failed');
+        }
+        
+    } catch (error) {
+        console.error('Error analyzing audio:', error);
+        statusDiv.textContent = '❌ Analysis failed';
+        statusDiv.style.color = '#f44336';
+        showError('Audio analysis failed: ' + error.message);
+    }
+}
+
+// Analyze input based on current tab
+async function analyzeInput() {
+    if (currentTab === 'text') {
+        await analyzeText();
+    } else {
+        if (!isRecording) {
+            await analyzeSpeech();
+        }
+    }
+}
+
+// Analyze text with cache prevention
+async function analyzeText() {
+    const textInput = document.querySelector('.text-input');
+    const text = textInput.value.trim();
+
+    if (!text) {
+        showError('Please enter some text to analyze.');
+        return;
+    }
+
+    try {
+        showLoading('Analyzing text...');
+        
+        // Add cache busting
+        const cacheBuster = 't=' + Date.now();
+        
+        const response = await fetch('/analyze?' + cacheBuster, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                text: text,
+                request_id: generateRecordingId() // Use same ID generator for consistency
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.success) {
+            displayResults(result);
+            showSuccess(`Detected: ${result.emotion}`);
+        } else {
+            throw new Error(result.error || 'Analysis failed');
+        }
+        
+    } catch (error) {
+        console.error('Error analyzing text:', error);
+        showError('Text analysis failed: ' + error.message);
+    } finally {
+        hideLoading();
+    }
+}
+
+// Display results
+function displayResults(result) {
+    const resultsArea = document.getElementById('resultsArea');
+    const adviceSection = document.getElementById('adviceSection');
+    const adviceContent = document.getElementById('adviceContent');
+
+    if (result.success) {
+        const emotionColors = {
+            'happy': '#4CAF50',
+            'sad': '#2196F3', 
+            'anxious': '#FF9800',
+            'angry': '#f44336',
+            'stressed': '#9C27B0',
+            'depressed': '#607D8B',
+            'neutral': '#9E9E9E',
+            'emotional': '#E91E63',
+            'excited': '#FF9800',
+            'calm': '#4CAF50'
+        };
+
+        const color = emotionColors[result.emotion] || '#9E9E9E';
+
+        resultsArea.innerHTML = `
+            <div class="emotion-result" style="background: ${color}; padding: 20px; border-radius: 10px; color: white; text-align: center; margin-bottom: 20px;">
+                <h3 style="margin: 0; font-size: 1.5em;">${result.emotion.toUpperCase()}</h3>
+                <p style="margin: 10px 0 0 0; font-size: 1.1em;">Detected Emotion</p>
+            </div>
+            <div class="confidence-info" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <strong style="display: block; margin-bottom: 10px;">Confidence: ${(result.confidence * 100).toFixed(1)}%</strong>
+                <div class="confidence-bar" style="width: 100%; height: 20px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                    <div class="confidence-fill" style="height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); border-radius: 10px; width: ${result.confidence * 100}%; transition: width 0.5s ease;"></div>
+                </div>
+                ${result.detection_method ? `<small style="color: #666; display: block; margin-top: 8px;">Detection method: ${result.detection_method}</small>` : ''}
+            </div>
+        `;
+
+        // Display advice
+        if (result.advice) {
+            adviceSection.classList.remove('hidden');
+            adviceContent.innerHTML = `
+                <div class="advice-category" style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid ${color};">
+                    <h4 style="color: ${color}; margin-bottom: 10px;">🚀 Immediate Actions</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        ${result.advice.immediate_actions.map(action => `<li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">• ${action}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="advice-category" style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid ${color};">
+                    <h4 style="color: ${color}; margin-bottom: 10px;">📈 Long-term Strategies</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        ${result.advice.long_term_strategies.map(strategy => `<li style="padding: 8px 0; border-bottom: 1px solid #f0f0f0;">• ${strategy}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="advice-category" style="background: white; padding: 15px; border-radius: 10px; border-left: 4px solid ${color};">
+                    <h4 style="color: ${color}; margin-bottom: 10px;">🏥 Professional Guidance</h4>
+                    <p style="margin: 0; color: #666;">${result.advice.professional_guidance}</p>
+                </div>
+            `;
+        }
+
+        // Load updated history
+        loadHistory();
+    } else {
+        resultsArea.innerHTML = `<div style="color: #f44336; background: #ffebee; padding: 15px; border-radius: 10px; text-align: center;">
+            <strong>Error:</strong> ${result.error}
+        </div>`;
+    }
+}
+
+// Utility functions
+function showError(message) {
+    // Simple alert for now - you can replace with toast notifications
+    alert('❌ ' + message);
+}
+
+function showSuccess(message) {
+    console.log('✅ ' + message);
+    // You can add toast notifications here
+}
+
+function showLoading(message) {
+    console.log('⏳ ' + message);
+    // You can implement a loading spinner here
+}
+
+function hideLoading() {
+    // Hide loading indicator
+}
+
+// Clear input
+function clearInput() {
+    document.querySelector('.text-input').value = '';
+    resetRecordingUI();
+    // Clear results when input is cleared
+    document.getElementById('resultsArea').innerHTML = '<p style="color: #666; text-align: center; padding: 40px;">Enter your thoughts above to get AI-powered emotional analysis.</p>';
+    document.getElementById('adviceSection').classList.add('hidden');
+}
+
+// Load analysis history
+async function loadHistory() {
+    try {
+        const cacheBuster = 't=' + Date.now();
+        const response = await fetch('/history?' + cacheBuster);
+        const history = await response.json();
+        
+        const historyList = document.getElementById('historyList');
+        historyList.innerHTML = '';
+
+        if (history.length === 0) {
+            historyList.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No analysis history yet</p>';
+            return;
+        }
+
+        history.slice(-5).reverse().forEach(item => {
+            const emotionColors = {
+                'happy': '#4CAF50',
+                'sad': '#2196F3',
+                'anxious': '#FF9800',
+                'angry': '#f44336',
+                'stressed': '#9C27B0',
+                'depressed': '#607D8B',
+                'neutral': '#9E9E9E',
+                'emotional': '#E91E63',
+                'excited': '#FF9800',
+                'calm': '#4CAF50'
+            };
+
+            const color = emotionColors[item.emotion] || '#9E9E9E';
+            const time = new Date(item.timestamp).toLocaleTimeString();
+            const inputType = item.input_type === 'speech' ? '🎤' : '📝';
+
+            historyList.innerHTML += `
+                <div class="history-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: white; margin-bottom: 8px; border-radius: 8px; border-left: 4px solid ${color};">
+                    <div>
+                        <span style="background: ${color}; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
+                            ${inputType} ${item.emotion}
+                        </span>
+                        <small style="color: #666; margin-left: 10px;">${time}</small>
+                    </div>
+                    <div style="font-weight: bold; color: ${color};">${(item.confidence * 100).toFixed(0)}%</div>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error('Error loading history:', error);
+    }
+}
+
+// Clear history
+async function clearHistory() {
+    try {
+        const cacheBuster = 't=' + Date.now();
+        await fetch('/clear-history?' + cacheBuster, { method: 'POST' });
+        document.getElementById('historyList').innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">No analysis history yet</p>';
+        showSuccess('History cleared');
+    } catch (error) {
+        console.error('Error clearing history:', error);
+        showError('Failed to clear history');
+    }
+}
+
+// Load model status on page load
+async function loadModelStatus() {
+    try {
+        const cacheBuster = 't=' + Date.now();
+        const response = await fetch('/health?' + cacheBuster);
+        const status = await response.json();
+        
+        const modelInfo = document.getElementById('modelInfo');
+        if (status.using_fallback) {
+            modelInfo.textContent = 'Using advanced fallback model - comprehensive emotion detection available';
+        } else {
+            modelInfo.textContent = `Trained model loaded with ${status.accuracy} accuracy`;
+        }
+    } catch (error) {
+        console.error('Error loading model status:', error);
+    }
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadModelStatus();
+    loadHistory();
+    
+    // Clear any previous results on page load
+    resetRecordingUI();
+});
+       
+    </script>
+</body>
+</html>
