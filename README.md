@@ -1,4 +1,5 @@
 # AI Mental Health Tone Detector 🧠
+MINI PROJECT
 
 An advanced AI-powered system that detects emotional tones from text and provides comprehensive mental health recommendations.
 
@@ -13,5 +14,4 @@ An advanced AI-powered system that detects emotional tones from text and provide
 ## Quick Start
 
 ### Option 1: Complete System
-```bash
-python run_system.py
+
