@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto text-center">
+        <h1 class="display-4 mb-4">🧠 AI Mental Health Tone Detector</h1>
+        <p class="lead mb-4">Understand your emotional state through advanced AI text analysis and get personalized mental health suggestions</p>
+        
+        {% if not session.user_id %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg me-md-2">Get Started</a>
+                <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg">Login</a>
+            </div>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">🎭 25+ Emotions</h5>
+                <p class="card-text">Advanced AI detects various emotional states with high accuracy</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">💡 Personalized Suggestions</h5>
+                <p class="card-text">Get tailored mental health recommendations based on your emotions</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">🔒 Secure & Private</h5>
+                <p class="card-text">Your data is protected, confidential, and secure</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <h4>How It Works:</h4>
+                <ol class="list-group list-group-numbered">
+                    <li class="list-group-item">Register for a free account</li>
+                    <li class="list-group-item">Write about your thoughts or feelings</li>
+                    <li class="list-group-item">AI analyzes your emotional tone</li>
+                    <li class="list-group-item">Receive personalized suggestions</li>
+                    <li class="list-group-item">Track your emotional journey over time</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
